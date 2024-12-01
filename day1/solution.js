@@ -44,6 +44,18 @@ async function main() {
         const sum = diffList.reduce((acc, el) => acc + el, 0);
         console.log('Sum of diffs is ', sum);
 
+        // Similarity score
+        const similarities = [];
+        for (let i = 0; i < leftResultsOrdered.length; i++) {
+            const nrOfLeftList = leftResultsOrdered[i];
+            const occurencesInRightList = rightResultsOrdered.filter(element => element === nrOfLeftList).length;
+            similarities.push(nrOfLeftList * occurencesInRightList);
+        }
+
+        // Sum up the similarity score
+        const similaritySum = similarities.reduce((acc, el) => acc + el, 0);
+        console.log('Sum of similarities is ', similaritySum);
+
     } catch (error) {
         console.error('Error processing the CSV file:', error);
     }
