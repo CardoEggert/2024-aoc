@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csv-parser');
 const safeValidator = require('./safeValidator');
+const safeValidatorDampened = require('./safeValidatorDampener');
 
 // Function to parse the CSV and return results as a Promise
 async function parseCsv(filePath) {
@@ -34,6 +35,14 @@ async function main() {
             }
         });
         console.log('Safe count is ', safeCount);
+
+        let dampenedSafeCount = 0;
+        results.forEach(result => {
+            if (safeValidatorDampened(result)) {
+                dampenedSafeCount++;
+            }
+        });
+        console.log('Dampened safe count is ', dampenedSafeCount);
 
     } catch (error) {
         console.error('Error processing the CSV file:', error);
