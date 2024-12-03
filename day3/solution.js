@@ -1,5 +1,6 @@
 const fs = require('fs');
 const mulParser = require('./mulParser')
+const mulParserSwitched = require('./mulParserSwitched')
 
 async function parseTxt(filePath) {
     return new Promise((resolve, reject) => {
@@ -20,6 +21,8 @@ async function solution() {
         const { inputText } = await parseTxt('input.txt');
 
         console.log('Result of multiplications is ', mulParser(inputText));
+
+        console.log('Result of switched multiplications is ', mulParserSwitched(inputText));
     } catch (error) {
         console.error('Error processing the CSV file:', error);
     }
