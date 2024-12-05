@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csv-parser');
 const xmasCounter = require('./xmascounter');
+const masCounter = require('./mascounter');
 
 // Function to parse the CSV and return results as a Promise
 async function parseCsv(filePath) {
@@ -28,6 +29,9 @@ async function main() {
 
         const xmasCount = xmasCounter(results);
         console.log('XMAS count: ', xmasCount)
+
+        const masCount = masCounter(results);
+        console.log('MAS count: ', masCount);
 
     } catch (error) {
         console.error('Error processing the CSV file:', error);
