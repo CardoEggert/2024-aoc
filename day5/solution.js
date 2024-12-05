@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csv-parser');
-const orderChecker = require('./orderChecker');
+const  { orderChecker } = require('./orderChecker');
+const  orderFixer = require('./orderFixer');
 
 // Function to parse the CSV and return results as a Promise
 async function parseCsv(filePath) {
@@ -45,6 +46,17 @@ async function main() {
         console.log('Middle pages are: ', middlePages);
 
         console.log('Sum of middle pages are: ', middlePages.reduce((acc, curr) => acc + curr, 0));
+
+        const fixedOrders = orderFixer(orderRules, updates);
+        console.log('Fixed orders are: ', fixedOrders);
+
+        const fixedMiddlePages = [];
+        for (let i = 0; i < fixedOrders.length; i++) {
+            fixedMiddlePages.push(fixedOrders[i][Math.floor(fixedOrders[i].length / 2)]);
+        }
+        console.log('Fixed middle pages are: ', fixedMiddlePages);
+
+        console.log('Sum of fixed middle pages are: ', fixedMiddlePages.reduce((acc, curr) => acc + curr, 0));
 
 
     } catch (error) {

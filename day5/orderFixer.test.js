@@ -1,7 +1,7 @@
-const { orderChecker } = require('./orderChecker');
+const orderFixer = require('./orderFixer');
 
-test('example test cases produces 9', () => {
-    expect(orderChecker(
+test('example test cases fixes non valid updates', () => {
+    expect(orderFixer(
         [
             [ 47, 53 ], [ 97, 13 ],
             [ 97, 61 ], [ 97, 47 ],
@@ -24,5 +24,5 @@ test('example test cases produces 9', () => {
             [ 97, 13, 75, 29, 47 ]
         ]
 
-    )).toStrictEqual([[ 75, 47, 61, 53, 29 ],[ 97, 61, 53, 29, 13 ],[ 75, 29, 13 ]]);
+    )).toStrictEqual([[ 97,75,47,61,53 ],[ 61,29,13 ],[ 97,75,47,29,13 ]]);
 });

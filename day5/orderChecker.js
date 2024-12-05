@@ -55,4 +55,10 @@ function findNextPages(orderRules, page) {
     return nextPages;
 }
 
-module.exports = orderChecker;
+module.exports = {
+    orderChecker,
+    isValidUpdate,
+    findValidOrderRules,
+    findNextPages,
+    findPagesAfterIndex
+};
