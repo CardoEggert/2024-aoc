@@ -1,4 +1,4 @@
-const trackGuard = require('./guardTracker');
+const { trackGuard } = require('./guardTracker');
 
 test('example test case mapped correctly', () => {
     expect(trackGuard(

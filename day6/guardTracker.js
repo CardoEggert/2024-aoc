@@ -1,18 +1,16 @@
 function trackGuard(map) {
-    let editedMap = [...map];
-    while (guardOnMap(editedMap)) {
-        const guardInformation = findGuard(editedMap);
-        if (guardInformation && guardInformation.direction) {
-            editedMap = moveGuard(editedMap, guardInformation);
-        }
+    let editedMap = structuredClone(map);
+    let guardInformation = findGuard(map);
+    while (guardInformation.onMap) {
+        guardInformation = moveGuard(editedMap, guardInformation);
     }
     return editedMap;
 }
 
 function guardOnMap(map) {
-    for (let x = 0; x < map.length; x++) {
-        for (let y = 0; y < map[x].length; y++) {
-            if (['^', 'v', '>', '<'].indexOf(map[x][y]) > -1) {
+    for (let y = 0; y < map.length; y++) {
+        for (let x = 0; x < map[y].length; x++) {
+            if (['^', 'v', '>', '<'].indexOf(map[y][x]) > -1) {
                 return true;
             }
         }
@@ -28,6 +26,7 @@ function findGuard(map) {
                 guardInfo['direction'] = map[y][x];
                 guardInfo['y'] = y;
                 guardInfo['x'] = x;
+                guardInfo['onMap'] = true;
             }
         }
     }
@@ -35,7 +34,6 @@ function findGuard(map) {
 }
 
 function moveGuard(editedMap, guardInformation) {
-    const mapCopy = [...editedMap];
     const { direction, x, y } = guardInformation;
     const nextPos = findNextPosition(direction, x, y);
     if (isNextPosOnMap(editedMap, nextPos.x, nextPos.y)) {
@@ -44,8 +42,8 @@ function moveGuard(editedMap, guardInformation) {
         }
         return moveGuardForward(editedMap, guardInformation, nextPos)
     }
-    mapCopy[y][x] = 'X';
-    return mapCopy
+    editedMap[y][x] = 'X';
+    return { onMap: false }
 }
 
 function findNextPosition(direction, x, y) {
@@ -75,27 +73,31 @@ function nextPosBlocker(editedMap, x, y) {
 }
 
 function turnGuard(editedMap, guardInformation) {
-    const mapCopy = [...editedMap];
     const { direction, x, y } = guardInformation;
+    let newDirection;
     if (direction === '^') {
-        mapCopy[y][x] = '>';
+        newDirection = '>';
     } else if (direction === 'v') {
-        mapCopy[y][x] = '<';
+        newDirection = '<';
     } else if (direction === '>') {
-        mapCopy[y][x] = 'v';
+        newDirection = 'v';
     } else if (direction === '<') {
-        mapCopy[y][x] = '^';
+        newDirection = '^';
     }
-    return mapCopy;
-
+    editedMap[y][x] = newDirection;
+    return { direction: newDirection, y: y, x: x, onMap: true };
 }
 
 function moveGuardForward(editedMap, guardInformation, nextPos) {
-    const mapCopy = [...editedMap];
     const { direction, x, y } = guardInformation;
-    mapCopy[nextPos.y][nextPos.x] = direction;
-    mapCopy[y][x] = 'X';
-    return mapCopy;
+    editedMap[nextPos.y][nextPos.x] = direction;
+    editedMap[y][x] = 'X';
+    return { direction, y: nextPos.y, x: nextPos.x, onMap: true };
 }
 
-module.exports = trackGuard;
+module.exports = {
+    trackGuard,
+    guardOnMap,
+    findGuard,
+    moveGuard
+};

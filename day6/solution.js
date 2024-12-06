@@ -1,6 +1,7 @@
 const fs = require('fs');
 const csv = require('csv-parser');
-const guardTracker = require('./guardTracker');
+const { trackGuard } = require('./guardTracker');
+const countPossibleBlocks = require('./guardBlocker');
 
 // Function to parse the CSV and return results as a Promise
 async function parseCsv(filePath) {
@@ -28,7 +29,7 @@ async function main() {
         const { map } = await parseCsv('input.txt');
 
         // Track guard
-        const guardTracked = guardTracker(map);
+        const guardTracked = trackGuard(map);
         let distinctCount = 0;
         for (let y = 0; y < guardTracked.length; y++) {
             for (let x = 0; x < guardTracked[y].length; x++) {
@@ -38,6 +39,9 @@ async function main() {
             }
         }
         console.log('Count of distinct positions is ', distinctCount)
+
+        // Find possible looping count
+        console.log('Count of possible obstructions are ' , countPossibleBlocks(map));
     } catch (error) {
         console.error('Error processing the CSV file:', error);
     }
