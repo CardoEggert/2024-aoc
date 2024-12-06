@@ -40,8 +40,11 @@ async function main() {
         }
         console.log('Count of distinct positions is ', distinctCount)
 
-        // Find possible looping count
+        const start = performance.now(); // High-resolution start time
         console.log('Count of possible obstructions are ' , countPossibleBlocks(map));
+        const end = performance.now(); // High-resolution end time
+
+        console.log(`Execution time: ${(end - start).toFixed(3)} ms`)
     } catch (error) {
         console.error('Error processing the CSV file:', error);
     }
