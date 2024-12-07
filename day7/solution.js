@@ -1,6 +1,6 @@
 const fs = require('fs');
 const csv = require('csv-parser');
-const isPossibleToCalibrate = require('./calibrationHandler');
+const { isPossibleToCalibrate } = require('./calibrationHandler');
 
 // Function to parse the CSV and return results as a Promise
 async function parseCsv(filePath) {
@@ -28,15 +28,23 @@ async function main() {
         // Await the parsing results
         const { calibrations } = await parseCsv('input.txt');
 
-        const possibleCalibrations = [];
+        const possibleCalibrationsWithoutConcatenation = [];
         for (let calibrationIndx = 0; calibrationIndx < calibrations.length; calibrationIndx++) {
             const calibration = calibrations[calibrationIndx];
-            if (isPossibleToCalibrate(calibration)) {
-                possibleCalibrations.push(calibration.expected);
+            if (isPossibleToCalibrate(calibration, ['+', '*'])) {
+                possibleCalibrationsWithoutConcatenation.push(calibration.expected);
             }
         }
-        console.log('Possible calibrations are with expected values: ', possibleCalibrations);
-        console.log('Sum of these expected values is ', possibleCalibrations.reduce((acc, currentValue) => acc + currentValue, 0));
+        console.log('Sum of + and * possible calibrations are ', possibleCalibrationsWithoutConcatenation.reduce((acc, currentValue) => acc + currentValue, 0));
+
+        const possibleCalibrationsWithConcatenation = [];
+        for (let calibrationIndx = 0; calibrationIndx < calibrations.length; calibrationIndx++) {
+            const calibration = calibrations[calibrationIndx];
+            if (isPossibleToCalibrate(calibration, ['+', '*', '||'])) {
+                possibleCalibrationsWithConcatenation.push(calibration.expected);
+            }
+        }
+        console.log('Sum of +, *, and || possible calibrations are ', possibleCalibrationsWithConcatenation.reduce((acc, currentValue) => acc + currentValue, 0));
 
     } catch (error) {
         console.error('Error processing the CSV file:', error);
