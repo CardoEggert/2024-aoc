@@ -1,14 +1,13 @@
-function countAntinodes(antennas) {
+function countAntinodes(antennas, resonance) {
     const groupedAntennas = groupAntennas(antennas);
     const antinodeLocations = new Set();
     const mapRowLength = antennas.length;
     const mapColLength = antennas[0].length;
     Object.entries(groupedAntennas).forEach(([antennaKey, antennaLocations]) => {
-        const groupedAntinodeLocs = findGroupedAntinodes(antennaLocations);
+        const groupedAntinodeLocs = findGroupedAntinodes(antennaLocations, mapRowLength, mapColLength, resonance);
         for (let grAntiNodeLocIndx = 0; grAntiNodeLocIndx < groupedAntinodeLocs.length; grAntiNodeLocIndx++) {
             const grAntiNodeLoc = groupedAntinodeLocs[grAntiNodeLocIndx];
-            if (grAntiNodeLoc.row > -1 && grAntiNodeLoc.row < mapRowLength
-                && grAntiNodeLoc.col > -1 && grAntiNodeLoc.col < mapColLength) {
+            if (inMap(grAntiNodeLoc, mapRowLength, mapColLength)) {
                 antinodeLocations.add(grAntiNodeLoc.row + '-' + grAntiNodeLoc.col);
             }
         }
@@ -32,19 +31,19 @@ function groupAntennas(antennas) {
     return groupedAntennas;
 }
 
-function findGroupedAntinodes(antennaLocations) {
+function findGroupedAntinodes(antennaLocations, mapRowLength, mapColLength, resonance) {
     const antinodeLocations = [];
     for (let antennaLocIndx = 0; antennaLocIndx < antennaLocations.length; antennaLocIndx++) {
         for (let nextAntennaLoc = antennaLocIndx + 1; nextAntennaLoc < antennaLocations.length; nextAntennaLoc++) {
             const start = antennaLocations[antennaLocIndx];
             const end = antennaLocations[nextAntennaLoc];
-            findAntinodeLocations(start, end).forEach((antinode) => antinodeLocations.push(antinode));
+            findAntinodeLocations(start, end, mapRowLength, mapColLength, resonance).forEach((antinode) => antinodeLocations.push(antinode));
         }
     }
     return antinodeLocations;
 }
 
-function findAntinodeLocations(startNode, endNode) {
+function findAntinodeLocations(startNode, endNode, mapRowLength, mapColLength, resonance) {
     const { row: startRow, column: startCol } = startNode;
     const { row: endRow, column: endCol } = endNode;
     let antiNode1 = {};
@@ -55,7 +54,27 @@ function findAntinodeLocations(startNode, endNode) {
     let colDiff = startCol - endCol;
     antiNode1.col = startCol + colDiff;
     antiNode2.col = endCol - colDiff;
-    return [antiNode1, antiNode2];
+    const antiNodes = [antiNode1, antiNode2];
+    if (resonance) {
+        let nextAntiNode = { row: antiNode1.row, col: antiNode1.col };
+        while (inMap(nextAntiNode, mapRowLength, mapColLength)) {
+            nextAntiNode = { row: nextAntiNode.row + rowDiff, col: nextAntiNode.col + colDiff };
+            antiNodes.push(nextAntiNode);
+        }
+        nextAntiNode = { row: antiNode2.row, col: antiNode2.col };
+        while (inMap(nextAntiNode, mapRowLength, mapColLength)) {
+            nextAntiNode = { row: nextAntiNode.row - rowDiff, col: nextAntiNode.col - colDiff };
+            antiNodes.push(nextAntiNode);
+        }
+        // Adding start and end as well because they are considered to be antinodes as well
+        antiNodes.push({ row: startRow, col: startCol });
+        antiNodes.push({ row: endRow, col: endCol });
+    }
+    return antiNodes;
+}
+
+function inMap(antinode, rowLength, colLength) {
+    return antinode.row > -1 && antinode.row < rowLength && antinode.col > -1 && antinode.col < colLength;
 }
 
 module.exports = {

@@ -25,7 +25,8 @@ async function main() {
     try {
         // Await the parsing results
         const { antennas } = await parseCsv('input.txt');
-        console.log('How many unique locations within the bounds of the map contain an antinode? Answer: ', countAntinodes(antennas));
+        console.log('How many unique locations within the bounds of the map contain an antinode? Answer: ', countAntinodes(antennas, false));
+        console.log('How many unique locations within the bounds of the map contain an antinode with resonance? Answer: ', countAntinodes(antennas, true));
     } catch (error) {
         console.error('Error processing the CSV file:', error);
     }
