@@ -49,26 +49,12 @@ function findAntinodeLocations(startNode, endNode) {
     const { row: endRow, column: endCol } = endNode;
     let antiNode1 = {};
     let antiNode2 = {};
-    let rowDiff = 0;
-    if (startRow > endRow) {
-        rowDiff = startRow - endRow;
-        antiNode1.row = startRow + rowDiff;
-        antiNode2.row = endRow - rowDiff;
-    } else {
-        rowDiff = endRow - startRow;
-        antiNode1.row = startRow - rowDiff;
-        antiNode2.row = endRow + rowDiff;
-    }
-    let colDiff = 0;
-    if (startCol > endCol) {
-        colDiff = startCol - endCol;
-        antiNode1.col = startCol + colDiff;
-        antiNode2.col = endCol - colDiff;
-    } else {
-        colDiff = endCol - startCol;
-        antiNode1.col = startCol - colDiff;
-        antiNode2.col = endCol + colDiff;
-    }
+    let rowDiff = startRow - endRow;
+    antiNode1.row = startRow + rowDiff;
+    antiNode2.row = endRow - rowDiff;
+    let colDiff = startCol - endCol;
+    antiNode1.col = startCol + colDiff;
+    antiNode2.col = endCol - colDiff;
     return [antiNode1, antiNode2];
 }
 
