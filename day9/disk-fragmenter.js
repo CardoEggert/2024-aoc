@@ -1,4 +1,4 @@
-function fragmentDisk(diskMap) {
+function fragmentDisk(diskMap, wholeDisk) {
     const files = []; // even indexes
     const freeSpace = []; // odd indexes
     for (let diskMapIndx = 0; diskMapIndx < diskMap.length; diskMapIndx++) {
@@ -21,10 +21,39 @@ function fragmentDisk(diskMap) {
             }
         }
     }
-    while (gapsRemaining(compactedResult)) {
-        moveFileFromRightToLeft(compactedResult);
+    if (wholeDisk) {
+        moveWholeFilesFromRightToLeft(compactedResult);
+    } else {
+        while (gapsRemaining(compactedResult)) {
+            moveFileFromRightToLeft(compactedResult);
+        }
     }
     return compactedResult;
+}
+
+function moveWholeFilesFromRightToLeft(result) {
+    const fileIdsDecreasing = getFileIdsDecreasing(result);
+    for (let fileIdIndx = 0; fileIdIndx < fileIdsDecreasing.length; fileIdIndx++) {
+        const fileId = fileIdsDecreasing[fileIdIndx];
+        if (fileIdIndx % 100 === 0) {
+            console.log('Handling ', fileIdIndx, ' of ', fileIdsDecreasing.length);
+        }
+        const requiredSize = result.filter(f => f === fileId).length;
+        if (fileMovable(result, fileId, requiredSize)) {
+            for (let resultIndx = result.indexOf('.'); resultIndx < result.lastIndexOf('.'); resultIndx++) {
+                if (result[resultIndx] === '.' && fileIdFits(result, resultIndx, requiredSize)) {
+                    moveWholeFile(result, fileId, resultIndx, requiredSize);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+function moveWholeFile(result, fileId, freeSpaceStartIndex, requiredSize) {
+    for (let freeSpaceIndx = freeSpaceStartIndex; freeSpaceIndx < freeSpaceStartIndex + requiredSize; freeSpaceIndx++) {
+        swap(result, freeSpaceIndx, result.lastIndexOf(fileId));
+    }
 }
 
 function gapsRemaining(result) {
@@ -34,6 +63,29 @@ function gapsRemaining(result) {
         }
     }
     return false;
+}
+
+function getFileIdsDecreasing(result) {
+    const fileIds = [...new Set(result.filter(f => f !== '.'))];
+    fileIds.sort((a, b) => b - a);
+    return fileIds;
+}
+
+function fileMovable(result, fileId, requiredSize) {
+    for (let i = result.indexOf('.'); i < result.indexOf(fileId); i++) {
+        if (fileIdFits(result, i, requiredSize)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function fileIdFits(result, resultIndx, requiredSize) {
+    let address = '';
+    for (let i = resultIndx; i < resultIndx + requiredSize; i++) {
+        address += result[i];
+    }
+    return address === '.'.repeat(requiredSize);
 }
 
 function moveFileFromRightToLeft(result) {
@@ -60,8 +112,10 @@ function swap(result, index1, index2) {
 
 function calculateChecksum(result) {
     let checksum = 0;
-    for (let resultIndx = 0; resultIndx < result.indexOf('.'); resultIndx++) {
-        checksum += resultIndx * Number(result[resultIndx]);
+    for (let resultIndx = 0; resultIndx < result.length; resultIndx++) {
+        if (result[resultIndx] !== '.') {
+            checksum += resultIndx * Number(result[resultIndx]);
+        }
     }
     return checksum;
 }
